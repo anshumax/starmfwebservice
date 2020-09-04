@@ -1,0 +1,43 @@
+apply plugin: 'java'
+apply plugin: 'maven'
+group = "com.claroinvestments.bsestarmf"
+version = "1.0"
+// In this section you declare where to find the dependencies of your project
+repositories {
+    // Use jcenter for resolving your dependencies.
+    // You can declare any Maven/Ivy/file repository here.
+    mavenCentral()
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives sourcesJar
+}
+
+sourceCompatibility = 1.11
+targetCompatibility = 1.11
+
+jar {
+    baseName = 'starmf-service'
+}
+
+task fatJar(type: Jar) {
+    baseName = 'starmf-service'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
+
+dependencies {
+	compile group: 'commons-io', name: 'commons-io', version: '2.6'
+	compile group: 'com.google.guava', name: 'guava', version: '27.0.1-jre'
+    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.7'
+    compile 'org.apache.pdfbox:pdfbox:2.0.7'
+	compile group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '2.3.3'
+    compile 'org.glassfish.jaxb:jaxb-runtime:2.3.2'
+	compile 'com.sun.xml.ws:jaxws-rt:2.3.2'
+    compile 'com.sun.xml.ws:rt:2.3.2'
+}
