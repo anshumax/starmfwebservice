@@ -59,9 +59,13 @@ public class BseStarMFAdditionalServices {
 	}
 	
 	public boolean isBseUserValid(BseUser bseUser) {
-		String getPasswordResponse = starMFWebServiceClient.getPassword(bseUser.getBseUserId(), bseUser.getBseMemberCode(), bseUser.getBseUserPassword(), BseStarMFConstants.BSE_PASS_KEY);
-		Password password = new Password(getPasswordResponse);
-		return password.isValidPassword();
+		try {
+			String getPasswordResponse = starMFWebServiceClient.getPassword(bseUser.getBseUserId(), bseUser.getBseMemberCode(), bseUser.getBseUserPassword(), BseStarMFConstants.BSE_PASS_KEY);
+			Password password = new Password(getPasswordResponse);
+			return password.isValidPassword();	
+		}catch(Exception e) {
+			return false;
+		}
 	}
 	
 	public String getEncryptedPassword(BseUser bseUser) throws MFPasswordRequestException{
