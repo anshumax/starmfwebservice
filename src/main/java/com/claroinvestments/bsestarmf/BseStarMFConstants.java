@@ -5,6 +5,8 @@ import java.time.format.DateTimeFormatter;
 public class BseStarMFConstants {
 	public static final String BSE_PASS_KEY = "123";
 	
+	public static final String EMPTY = "";
+	
 	public static final String STATUS_100 = "100";
 	public static final String STATUS_101 = "101";
 	public static final String STATUS_0 = "0";

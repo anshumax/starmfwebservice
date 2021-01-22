@@ -34,7 +34,7 @@ task fatJar(type: Jar) {
 dependencies {
 	compile group: 'commons-io', name: 'commons-io', version: '2.6'
 	compile group: 'com.google.guava', name: 'guava', version: '27.0.1-jre'
-    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.7'
+    //compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.7'
     compile 'org.apache.pdfbox:pdfbox:2.0.7'
 	compile group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '2.3.3'
     compile 'org.glassfish.jaxb:jaxb-runtime:2.3.2'

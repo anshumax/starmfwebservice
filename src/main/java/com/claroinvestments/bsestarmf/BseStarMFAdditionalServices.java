@@ -30,10 +30,14 @@ import com.claroinvestments.bsestarmf.additionalservices.PasswordRequest;
 import com.claroinvestments.bsestarmf.additionalservices.PaymentStatusResponse;
 import com.claroinvestments.bsestarmf.additionalservices.Response;
 import com.claroinvestments.bsestarmf.additionalservices.StarMFWebService;
+import com.claroinvestments.bsestarmf.additionalservices.StpOrderEntryResponse;
+import com.claroinvestments.bsestarmf.additionalservices.SwpOrderEntryResponse;
 import com.claroinvestments.bsestarmf.additionalservices.Ucc;
 import com.claroinvestments.bsestarmf.additionalservices.UccResponse;
 import com.claroinvestments.bsestarmf.enums.AccessTokenRequestType;
 import com.claroinvestments.bsestarmf.enums.AdditionServicesFlag;
+import com.claroinvestments.bsestarmf.enums.BuySellType;
+import com.claroinvestments.bsestarmf.enums.FrequencyType;
 import com.claroinvestments.bsestarmf.enums.MandateType;
 import com.claroinvestments.bsestarmf.enums.OrderStatus;
 import com.claroinvestments.bsestarmf.enums.OrderType;
@@ -41,6 +45,7 @@ import com.claroinvestments.bsestarmf.enums.PaymentStatusSegment;
 import com.claroinvestments.bsestarmf.enums.SettlementType;
 import com.claroinvestments.bsestarmf.enums.SubOrderType;
 import com.claroinvestments.bsestarmf.enums.SystematicPlanType;
+import com.claroinvestments.bsestarmf.enums.TransMode;
 import com.claroinvestments.bsestarmf.enums.TransactionType;
 import com.claroinvestments.bsestarmf.exceptions.MFAdditionalServicesException;
 import com.claroinvestments.bsestarmf.exceptions.MFPasswordRequestException;
@@ -55,7 +60,6 @@ public class BseStarMFAdditionalServices {
 		StarMFWebService starMFWebService = new StarMFWebService(url);
 		AddressingFeature addressingFeature = new AddressingFeature(true,true);
 		starMFWebServiceClient = starMFWebService.getWSHttpBindingIStarMFWebService1(addressingFeature);
-		
 	}
 	
 	public boolean isBseUserValid(BseUser bseUser) {
@@ -360,5 +364,85 @@ public class BseStarMFAdditionalServices {
 			throw new MFAdditionalServicesException("Unable to retrieve payment link: " + mfapiResult.getResponse());
 		}
 		return mfapiResult.getResponse();
+	}
+	
+	public StpOrderEntryResponse newStp(BseUser bseUser, String euin, String clientCode, String fromSchemeCode, String toSchemeCode, 
+			BuySellType buySellType, String folioNo, String internalReferenceNo, LocalDate startDate, 
+			FrequencyType frequencyType, Integer noOfTransfers, String installmentAmount, String remarks, String encryptedPassword) {
+		String stpRegistrationParamString = new StringBuilder()
+				.append(clientCode).append('|')
+				.append(fromSchemeCode).append('|')
+				.append(toSchemeCode).append('|')
+				.append(buySellType.getValue()).append('|')
+				.append(TransactionType.PURCHASE.getValue()).append('|')
+				.append(folioNo).append('|')
+				.append(BseUtils.getUniqueRefNo()).append('|')
+				.append(startDate.format(starMfDateTimeFormatter)).append('|')
+				.append(frequencyType.getValue()).append('|')
+				.append(noOfTransfers).append('|')
+				.append(installmentAmount)
+				.append(BseStarMFConstants.N).append('|')
+				.append(BseStarMFConstants.EMPTY).append('|')
+				.append(BseStarMFConstants.Y).append('|')
+				.append(euin).append('|')
+				.append(remarks).append('|')
+				.append(BseStarMFConstants.EMPTY)
+				.toString();
+		
+		String responseString = starMFWebServiceClient.mfapi(AdditionServicesFlag.STP_REGISTRATION.getValue(), bseUser.getBseUserId(), encryptedPassword, stpRegistrationParamString);
+		
+		return new StpOrderEntryResponse(responseString);
+	}
+	
+	public SwpOrderEntryResponse newSwp(BseUser bseUser, String euin, String clientCode, String schemeCode, String folioNo, 
+			String internalReferenceNo,	LocalDate startDate, Integer noOfWithdrawals, FrequencyType frequencyType, 
+			String installmentAmount, String installmentUnits, String remarks, String encryptedPassword) {
+		String swpRegistrationParamString = new StringBuilder()
+				.append(clientCode).append('|')
+				.append(schemeCode).append('|')
+				.append(TransMode.PHYSICAL.getValue()).append('|')
+				.append(folioNo).append('|')
+				.append(internalReferenceNo).append('|')
+				.append(startDate.format(starMfDateTimeFormatter)).append('|')
+				.append(noOfWithdrawals).append('|')
+				.append(frequencyType.getValue()).append('|')
+				.append(installmentAmount).append('|')
+				.append(installmentUnits).append('|')
+				.append(BseStarMFConstants.N).append('|')
+				.append(BseStarMFConstants.EMPTY).append('|')
+				.append(BseStarMFConstants.Y).append('|')
+				.append(euin).append('|')
+				.append(remarks).append('|')
+				.append(BseStarMFConstants.EMPTY).toString();
+		
+		String responseString = starMFWebServiceClient.mfapi(AdditionServicesFlag.SWP_REGISTRATION.getValue(), bseUser.getBseUserId(), encryptedPassword, swpRegistrationParamString);
+		
+		return new SwpOrderEntryResponse(responseString);
+	}
+	
+	public StpOrderEntryResponse cancelStp(BseUser bseUser, String euin, String stpRegistrationNo, String clientCode, 
+			String remarks, String encryptedPassword) {
+		String stpCancellationParamString = new StringBuilder()
+				.append(stpRegistrationNo).append('|')
+				.append(clientCode).append('|')
+				.append(remarks)
+				.toString();
+		
+		String responseString = starMFWebServiceClient.mfapi(AdditionServicesFlag.STP_CANCELLATION.getValue(), bseUser.getBseUserId(), encryptedPassword, stpCancellationParamString);
+		
+		return new StpOrderEntryResponse(responseString);
+	}
+	
+	public SwpOrderEntryResponse cancelSwp(BseUser bseUser, String euin, String swpRegistrationNo, String clientCode, 
+			String remarks, String encryptedPassword) {
+		String swpCancellationParamString = new StringBuilder()
+				.append(swpRegistrationNo).append('|')
+				.append(clientCode).append('|')
+				.append(remarks)
+				.toString();
+		
+		String responseString = starMFWebServiceClient.mfapi(AdditionServicesFlag.SWP_CANCELLATION.getValue(), bseUser.getBseUserId(), encryptedPassword, swpCancellationParamString);
+		
+		return new SwpOrderEntryResponse(responseString);
 	}
 }

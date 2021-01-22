@@ -42,15 +42,15 @@ public class BseStarMFOrderService {
 		return getPassword.getEncryptedPassword();
 	}
 
-	public MFOrderEntryResponse newPurchaseOrder(BseUser bseUser, String euin, String internalRefNo, String clientCode, String schemeCode,
-			Double amount, BuySellType buySellType, String folioNo, String encryptedPassword) throws MFOrderServiceException {
+	public MFOrderEntryResponse newPurchaseOrder(BseUser bseUser, String euin, String internalRefNo, String clientCode,
+			String schemeCode, Double amount, BuySellType buySellType, String folioNo, String encryptedPassword)
+			throws MFOrderServiceException {
 
 		String responseString = mfOrderEntryClient.orderEntryParam(MFOrderTransactionCode.NEW.getValue(),
 				BseUtils.getUniqueRefNo(), null, bseUser.getBseUserId(), bseUser.getBseMemberCode(), clientCode,
-				schemeCode, TransactionType.PURCHASE.getValue(), buySellType.getValue(),
-				DPTxn.PHYSICAL.getValue(), amount.toString(), null, BseStarMFConstants.Y, folioNo, null,
-				BseStarMFConstants.Y, internalRefNo, null, euin,
-				BseStarMFConstants.Y, BseStarMFConstants.Y, BseStarMFConstants.Y, null, encryptedPassword,
+				schemeCode, TransactionType.PURCHASE.getValue(), buySellType.getValue(), DPTxn.PHYSICAL.getValue(),
+				amount.toString(), null, BseStarMFConstants.Y, folioNo, null, BseStarMFConstants.Y, internalRefNo, null,
+				euin, BseStarMFConstants.Y, BseStarMFConstants.Y, BseStarMFConstants.Y, null, encryptedPassword,
 				BseStarMFConstants.BSE_PASS_KEY, null, null, null);
 		MFOrderEntryResponse response = new MFOrderEntryResponse(responseString);
 		if (!response.isSuccess()) {
@@ -59,8 +59,8 @@ public class BseStarMFOrderService {
 		return response;
 	}
 
-	public CancelOrderResponse cancelOrder(BseUser bseUser, String euin, String bseOrderId, String clientCode, BuySellType buySellType, String encryptedPassword)
-			throws MFOrderServiceException {
+	public CancelOrderResponse cancelPurchaseOrder(BseUser bseUser, String euin, String bseOrderId, String clientCode,
+			BuySellType buySellType, String encryptedPassword) throws MFOrderServiceException {
 		String transCode = MFOrderTransactionCode.CANCEL.getValue();
 		String transNo = BseUtils.getUniqueRefNo();
 		String userID = bseUser.getBseUserId();
@@ -86,9 +86,9 @@ public class BseStarMFOrderService {
 		String param3 = null;
 
 		String responseString = mfOrderEntryClient.orderEntryParam(transCode, transNo, bseOrderId, userID, memberId,
-				clientCode, schemeCd, buySell, buySellType.getValue(), dpTxn, orderVal, qty, allRedeem, folioNo, remarks,
-				kycStatus, refNo, subBrCode, euin, euinVal, minRedeem, dpc, ipAdd, encryptedPassword, passKey, param1,
-				param2, param3);
+				clientCode, schemeCd, buySell, buySellType.getValue(), dpTxn, orderVal, qty, allRedeem, folioNo,
+				remarks, kycStatus, refNo, subBrCode, euin, euinVal, minRedeem, dpc, ipAdd, encryptedPassword, passKey,
+				param1, param2, param3);
 		CancelOrderResponse response = new CancelOrderResponse(responseString);
 		if (!response.isSuccess()) {
 			throw new MFOrderServiceException(response.toString());
@@ -97,7 +97,7 @@ public class BseStarMFOrderService {
 	}
 
 	public SipOrderEntryResponse newSip(BseUser bseUser, String euin, String clientCode, String internalRefNo,
-			String schemeCode, LocalDate startDate, FrequencyType frequency, Double installmentAmount, 
+			String schemeCode, LocalDate startDate, FrequencyType frequency, Double installmentAmount,
 			Integer noOfInstallments, String encryptedPassword) {
 		String transactionCode = SipTransactionCode.NEW.getValue();
 		String uniqueRefNo = BseUtils.getUniqueRefNo();
@@ -124,40 +124,42 @@ public class BseStarMFOrderService {
 		String param2 = null;
 		String param3 = null;
 
-		String sipOrderEntryResponseString = mfOrderEntryClient.sipOrderEntryParam(transactionCode, uniqueRefNo, schemeCode, 
-				memberCode, clientCode, userID, internalRefNo, transMode, dpTxnMode, startDateString, frequencyType, 
-				frequencyAllowed, installmentAmountString, noOfInstallmentsString, remarks, folioNo, firstOrderFlag, subberCode, euin, euinVal, dpc, regId, ipAdd, password, passKey, param1, param2, param3);
+		String sipOrderEntryResponseString = mfOrderEntryClient.sipOrderEntryParam(transactionCode, uniqueRefNo,
+				schemeCode, memberCode, clientCode, userID, internalRefNo, transMode, dpTxnMode, startDateString,
+				frequencyType, frequencyAllowed, installmentAmountString, noOfInstallmentsString, remarks, folioNo,
+				firstOrderFlag, subberCode, euin, euinVal, dpc, regId, ipAdd, password, passKey, param1, param2,
+				param3);
 
 		SipOrderEntryResponse sipOrderEntryResponse = new SipOrderEntryResponse(sipOrderEntryResponseString);
 		return sipOrderEntryResponse;
 	}
 
 	public IsipOrderEntryResponse newISip(BseUser bseUser, String euin, String clientCode, String internalRefNo,
-			String schemeCode, LocalDate startDate, FrequencyType frequency, Double installmentAmount, Integer noOfInstallments,
-			String iSipMandateID, String encryptedPassword) {
+			String schemeCode, LocalDate startDate, FrequencyType frequency, Double installmentAmount,
+			Integer noOfInstallments, String iSipMandateID, String encryptedPassword) {
 
 		String responseString = mfOrderEntryClient.xsipOrderEntryParam(SipTransactionCode.NEW.getValue(),
 				BseUtils.getUniqueRefNo(), schemeCode, bseUser.getBseMemberCode(), clientCode, bseUser.getBseUserId(),
 				internalRefNo, TransMode.PHYSICAL.getValue(), DPTxn.PHYSICAL.getValue(),
 				startDate.format(BseStarMFConstants.BSE_DATETIME_FORMATTER), frequency.getValue(), Integer.toString(1),
-				installmentAmount.toString(), noOfInstallments.toString(), null, null, BseStarMFConstants.N,
-				null, null, null, euin, BseStarMFConstants.Y, BseStarMFConstants.Y, null, null, encryptedPassword,
+				installmentAmount.toString(), noOfInstallments.toString(), null, null, BseStarMFConstants.N, null, null,
+				null, euin, BseStarMFConstants.Y, BseStarMFConstants.Y, null, null, encryptedPassword,
 				BseStarMFConstants.BSE_PASS_KEY, null, iSipMandateID, null);
 		IsipOrderEntryResponse xsipOrderEntryResponse = new IsipOrderEntryResponse(responseString);
 		return xsipOrderEntryResponse;
 	}
 
 	public XsipOrderEntryResponse newXSip(BseUser bseUser, String euin, String clientCode, String internalRefNo,
-			String schemeCode, LocalDate startDate, FrequencyType frequency, Double installmentAmount, Integer noOfInstallments,
-			String xSipMandateID, String encryptedPassword) {
+			String schemeCode, LocalDate startDate, FrequencyType frequency, Double installmentAmount,
+			Integer noOfInstallments, String xSipMandateID, String encryptedPassword) {
 
 		String responseString = mfOrderEntryClient.xsipOrderEntryParam(SipTransactionCode.NEW.getValue(),
 				BseUtils.getUniqueRefNo(), schemeCode, bseUser.getBseMemberCode(), clientCode, bseUser.getBseUserId(),
 				internalRefNo, TransMode.PHYSICAL.getValue(), DPTxn.PHYSICAL.getValue(),
 				startDate.format(BseStarMFConstants.BSE_DATETIME_FORMATTER), frequency.getValue(), Integer.toString(1),
-				installmentAmount.toString(), noOfInstallments.toString(), null, null, BseStarMFConstants.N,
-				null, xSipMandateID, null, euin, BseStarMFConstants.Y, BseStarMFConstants.Y, null, null,
-				encryptedPassword, BseStarMFConstants.BSE_PASS_KEY, null, null, null);
+				installmentAmount.toString(), noOfInstallments.toString(), null, null, BseStarMFConstants.N, null,
+				xSipMandateID, null, euin, BseStarMFConstants.Y, BseStarMFConstants.Y, null, null, encryptedPassword,
+				BseStarMFConstants.BSE_PASS_KEY, null, null, null);
 
 		System.out.println(responseString);
 		XsipOrderEntryResponse xsipOrderEntryResponse = new XsipOrderEntryResponse(responseString);
@@ -233,4 +235,53 @@ public class BseStarMFOrderService {
 		return response;
 	}
 
+	public MFOrderEntryResponse newFullSwitchOutOrder(BseUser bseUser, String clientCode, String euin,
+			String fromSchemeCode, String toSchemeCode, BuySellType buySellType, String folioNo,
+			String encryptedPassword) {
+
+		String responseString = mfOrderEntryClient.switchOrderEntryParam(MFOrderTransactionCode.NEW.getValue(),
+				BseUtils.getUniqueRefNo(), null, bseUser.getBseUserId(), bseUser.getBseMemberCode(), clientCode,
+				fromSchemeCode, toSchemeCode, TransactionType.SWITCH_OUT.getValue(), buySellType.getValue(),
+				DPTxn.PHYSICAL.getValue(), null, null, BseStarMFConstants.Y, folioNo, null, BseStarMFConstants.Y, null,
+				null, euin, BseStarMFConstants.Y, null, encryptedPassword, BseStarMFConstants.BSE_PASS_KEY, null, null,
+				null);
+		return new MFOrderEntryResponse(responseString);
+	}
+
+	public MFOrderEntryResponse newPartialSwitchOutOrder(BseUser bseUser, String euin, String clientCode,
+			String fromSchemeCode, String toSchemeCode, BuySellType buySellType, String folioNo, String switchAmount,
+			String switchUnits, String encryptedPassword) {
+
+		String responseString = mfOrderEntryClient.switchOrderEntryParam(MFOrderTransactionCode.NEW.getValue(),
+				BseUtils.getUniqueRefNo(), null, bseUser.getBseUserId(), bseUser.getBseMemberCode(), clientCode,
+				fromSchemeCode, toSchemeCode, TransactionType.SWITCH_OUT.getValue(), buySellType.getValue(),
+				DPTxn.PHYSICAL.getValue(), switchAmount, switchUnits, BseStarMFConstants.N, folioNo, null,
+				BseStarMFConstants.Y, null, null, euin, BseStarMFConstants.Y, null, encryptedPassword,
+				BseStarMFConstants.BSE_PASS_KEY, null, null, null);
+		return new MFOrderEntryResponse(responseString);
+	}
+
+	public MFOrderEntryResponse cancelFullSwitchOrder(BseUser bseUser, String euin, String clientCode,
+			String fromSchemeCode, String toSchemeCode, BuySellType buySellType, String folioNo,
+			String encryptedPassword) {
+		String responseString = mfOrderEntryClient.switchOrderEntryParam(MFOrderTransactionCode.CANCEL.getValue(),
+				BseUtils.getUniqueRefNo(), null, bseUser.getBseUserId(), bseUser.getBseMemberCode(), clientCode,
+				fromSchemeCode, toSchemeCode, TransactionType.SWITCH_OUT.getValue(), buySellType.getValue(),
+				DPTxn.PHYSICAL.getValue(), null, null, BseStarMFConstants.Y, folioNo, null, BseStarMFConstants.Y, null,
+				null, euin, BseStarMFConstants.Y, null, encryptedPassword, BseStarMFConstants.BSE_PASS_KEY, null, null,
+				null);
+		return new MFOrderEntryResponse(responseString);
+	}
+
+	public MFOrderEntryResponse cancelPartialSwitchOrder(BseUser bseUser, String euin, String clientCode,
+			String fromSchemeCode, String toSchemeCode, BuySellType buySellType, String folioNo, String switchAmount,
+			String switchUnits, String encryptedPassword) {
+		String responseString = mfOrderEntryClient.switchOrderEntryParam(MFOrderTransactionCode.CANCEL.getValue(),
+				BseUtils.getUniqueRefNo(), null, bseUser.getBseUserId(), bseUser.getBseMemberCode(), clientCode,
+				fromSchemeCode, toSchemeCode, TransactionType.SWITCH_OUT.getValue(), buySellType.getValue(),
+				DPTxn.PHYSICAL.getValue(), switchAmount, switchUnits, BseStarMFConstants.N, folioNo, null,
+				BseStarMFConstants.Y, null, null, euin, BseStarMFConstants.Y, null, encryptedPassword,
+				BseStarMFConstants.BSE_PASS_KEY, null, null, null);
+		return new MFOrderEntryResponse(responseString);
+	}
 }

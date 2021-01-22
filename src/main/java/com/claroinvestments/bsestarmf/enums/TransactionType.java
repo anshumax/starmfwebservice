@@ -2,7 +2,8 @@ package com.claroinvestments.bsestarmf.enums;
 
 public enum TransactionType {
 	PURCHASE("P"),
-	REDEMPTION("R");
+	REDEMPTION("R"),
+	SWITCH_OUT("SO");
 
 	private String value; 
 	  

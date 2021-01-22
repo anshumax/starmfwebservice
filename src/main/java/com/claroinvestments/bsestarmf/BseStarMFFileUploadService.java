@@ -7,8 +7,6 @@ import java.time.format.DateTimeFormatter;
 
 import javax.xml.ws.soap.AddressingFeature;
 
-import org.apache.commons.lang3.StringUtils;
-
 import com.claroinvestments.bsestarmf.exceptions.MFFileUploadServiceException;
 import com.claroinvestments.bsestarmf.exceptions.MFPasswordRequestException;
 import com.claroinvestments.bsestarmf.fileupload.FileData;
@@ -48,8 +46,8 @@ public class BseStarMFFileUploadService {
 		fileData.setDocumentType(BseStarMFConstants.NRM);
 		fileData.setEncryptedPassword(encryptedPassword);
 		fileData.setFileName(fileName);
-		fileData.setFiller1(StringUtils.EMPTY);
-		fileData.setFiller2(StringUtils.EMPTY);
+		fileData.setFiller1(BseStarMFConstants.EMPTY);
+		fileData.setFiller2(BseStarMFConstants.EMPTY);
 		fileData.setFlag(BseStarMFConstants.UCC);
 		fileData.setMemberCode(bseUser.getBseMemberCode());
 		fileData.setPFileBytes(imageBytes);

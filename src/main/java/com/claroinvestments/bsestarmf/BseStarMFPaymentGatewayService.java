@@ -5,8 +5,6 @@ import java.util.Arrays;
 
 import javax.xml.ws.soap.AddressingFeature;
 
-import org.apache.commons.lang3.StringUtils;
-
 import com.claroinvestments.bsestarmf.enums.PaymentMode;
 import com.claroinvestments.bsestarmf.exceptions.MFPasswordRequestException;
 import com.claroinvestments.bsestarmf.exceptions.MFPaymentServiceException;
@@ -57,7 +55,7 @@ public class BseStarMFPaymentGatewayService {
 		param.setTotalAmount(totalAmount.toString());
 		
 		Response response = starMFPaymentGatewayServiceClient.paymentGatewayAPI(param);
-		if(!StringUtils.equals(response.getStatus(),BseStarMFConstants.STATUS_100)){
+		if(BseStarMFConstants.STATUS_100.equals(response.getStatus())){
 			throw new MFPaymentServiceException(response.getResponseString());
 		}
 		
