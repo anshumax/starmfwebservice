@@ -250,12 +250,12 @@ public class BseStarMFOrderService {
 
 	public MFOrderEntryResponse newPartialSwitchOutOrder(BseUser bseUser, String euin, String clientCode,
 			String fromSchemeCode, String toSchemeCode, BuySellType buySellType, String folioNo, String switchAmount,
-			String switchUnits, String encryptedPassword) {
+			String encryptedPassword) {
 
 		String responseString = mfOrderEntryClient.switchOrderEntryParam(MFOrderTransactionCode.NEW.getValue(),
 				BseUtils.getUniqueRefNo(), null, bseUser.getBseUserId(), bseUser.getBseMemberCode(), clientCode,
 				fromSchemeCode, toSchemeCode, TransactionType.SWITCH_OUT.getValue(), buySellType.getValue(),
-				DPTxn.PHYSICAL.getValue(), switchAmount, switchUnits, BseStarMFConstants.N, folioNo, null,
+				DPTxn.PHYSICAL.getValue(), switchAmount, BseStarMFConstants.EMPTY, BseStarMFConstants.N, folioNo, null,
 				BseStarMFConstants.Y, null, null, euin, BseStarMFConstants.Y, null, encryptedPassword,
 				BseStarMFConstants.BSE_PASS_KEY, null, null, null);
 		return new MFOrderEntryResponse(responseString);
