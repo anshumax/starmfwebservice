@@ -57,23 +57,3 @@ public class AppMain {
 
 ```
 
-
-Overview
-==
-Keras is built around a few core abstractions which comprise much of what is needed to build deep learning models. 
-These include Layers, Models, Optimizers, Activations, Losses, Metrics, Regularizers, and Initializers.
-
-Basics
---
-To use TensorFlow, we must have access to a `Graph` to build and run computations. In Python, this is constructed
-implicitly. In TF Java, the `Graph` and `Ops` objects must be created explicitly. Thus, we
-leave this (below) for the user to write, and allow the `Ops` object to be passed
-throughout keras `Layer` construction calls to provide access to core tensorflow operations.
-
-```java
-try(Graph graph = new Graph) {
-    Ops tf = Ops.create(graph);
-    
-    // Keras code here.
-}
-```
