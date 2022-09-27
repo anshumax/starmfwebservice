@@ -1,7 +1,7 @@
 
 # BSE StarMF Web Service
 
-This repository contains an unofficial Java implementation of the BSE StarMF SOAP Web Service API.
+This repository contains an unofficial Java implementation of the BSE StarMF SOAP Web Service.
 This has been used at least once on production.
 
 It is a work-in-progress; feel free to add issues / comments! Happy to collaborate. 
