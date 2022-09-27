@@ -19,13 +19,24 @@ import dev.anshumax.bsestarmf.payments.StarMFPaymentGatewayService;
 public class BseStarMFPaymentGatewayService {
 	
 	private IStarMFPaymentGatewayService starMFPaymentGatewayServiceClient;
-	
+
+	/**
+	 *
+	 * @param url
+	 * @throws MalformedURLException
+	 */
 	public BseStarMFPaymentGatewayService(String url) throws MalformedURLException {
 		StarMFPaymentGatewayService starMFPaymentGatewayService = new StarMFPaymentGatewayService(url);
 		AddressingFeature addressingFeature = new AddressingFeature(true,true);
 		this.starMFPaymentGatewayServiceClient = starMFPaymentGatewayService.getWSHttpBindingIStarMFPaymentGatewayService1(addressingFeature);
 	}
-	
+
+	/**
+	 *
+	 * @param bseUser
+	 * @return
+	 * @throws MFPasswordRequestException
+	 */
 	public String getEncryptedPassword(BseUser bseUser) throws MFPasswordRequestException {
 		PasswordRequest passwordRequest = new PasswordRequest();
 		passwordRequest.setMemberId(bseUser.getBseMemberCode());
@@ -38,7 +49,22 @@ public class BseStarMFPaymentGatewayService {
 		}
 		return response.getResponseString();
 	}
-	
+
+	/**
+	 *
+	 * @param bseUser
+	 * @param orders
+	 * @param totalAmount
+	 * @param accountNo
+	 * @param ifsc
+	 * @param bankId
+	 * @param paymentMode
+	 * @param logoutUrl
+	 * @param clientCode
+	 * @param encryptedPassword
+	 * @return
+	 * @throws MFPaymentServiceException
+	 */
 	public String getDirectPaymentPage(BseUser bseUser, String[] orders, BigDecimal totalAmount, String accountNo, String ifsc, String bankId, PaymentMode paymentMode, String logoutUrl, String clientCode, String encryptedPassword) throws MFPaymentServiceException {
 		ArrayOfstring ordersArray = new ArrayOfstring();
 		ordersArray.getString().addAll(Arrays.asList(orders));

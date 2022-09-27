@@ -20,12 +20,23 @@ public class BseStarMFFileUploadService {
 
 	private IStarMFFileUploadService starmfFileUploadServiceClient;
 
+	/**
+	 *
+	 * @param url
+	 * @throws MalformedURLException
+	 */
 	public BseStarMFFileUploadService(String url) throws MalformedURLException {
 		StarMFFileUploadService starmfFileUploadService = new StarMFFileUploadService(url);
 		AddressingFeature addressingFeature = new AddressingFeature(true,true);
 		starmfFileUploadServiceClient = starmfFileUploadService.getWSHttpBindingIStarMFFileUploadService1(addressingFeature);
 	}
 
+	/**
+	 *
+	 * @param bseUser
+	 * @return
+	 * @throws MFPasswordRequestException
+	 */
 	public String getEncryptedPassword(BseUser bseUser) throws MFPasswordRequestException {
 		PasswordRequest passwordRequest = new PasswordRequest();
 		passwordRequest.setMemberId(bseUser.getBseMemberCode());
@@ -37,7 +48,16 @@ public class BseStarMFFileUploadService {
 		}
 		return response.getResponseString();
 	}
-	
+
+	/**
+	 *
+	 * @param bseUser
+	 * @param userid
+	 * @param imageBytes
+	 * @param encryptedPassword
+	 * @throws IOException
+	 * @throws MFFileUploadServiceException
+	 */
 	public void uploadAOFImage(BseUser bseUser, String userid, byte[] imageBytes, String encryptedPassword) throws IOException, MFFileUploadServiceException {
 		
 		String fileName = bseUser.getBseMemberCode() + userid + LocalDate.now().format(DateTimeFormatter.ofPattern("ddMMyyyy")) + ".tiff";
@@ -57,7 +77,17 @@ public class BseStarMFFileUploadService {
 			throw new MFFileUploadServiceException(response.getResponseString());
 		}
 	}
-	
+
+	/**
+	 *
+	 * @param bseUser
+	 * @param clientCode
+	 * @param mandateId
+	 * @param imageName
+	 * @param mandateBytes
+	 * @param encryptedPassword
+	 * @throws MFFileUploadServiceException
+	 */
 	public void uploadXsipNachMandate(BseUser bseUser, String clientCode, String mandateId, String imageName, byte[] mandateBytes, String encryptedPassword) throws MFFileUploadServiceException {
 		
 		MandateScanFileData data = new MandateScanFileData();

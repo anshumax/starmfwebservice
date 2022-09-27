@@ -27,12 +27,24 @@ import dev.anshumax.bsestarmf.mforder.XsipOrderEntryResponse;
 public class BseStarMFOrderService {
 	private MFOrderEntry mfOrderEntryClient;
 
+
+	/**
+	 * @param url The base URL to initialize the service, can be either the production URL or the test URL
+	 * @throws MalformedURLException
+	 */
 	public BseStarMFOrderService(String url) throws MalformedURLException {
 		AddressingFeature addressingFeature = new AddressingFeature(true, true);
 		MFOrder mfOrderService = new MFOrder(url);
 		mfOrderEntryClient = mfOrderService.getWSHttpBindingMFOrderEntry1(addressingFeature);
 	}
 
+	/**
+	 * Note: It is advised to generate the encrypted password before each service request
+	 *
+	 * @param bseUser the BseUser object that encapsulates the member code, user ID and user password
+	 * @return The encrypted password
+	 * @throws MFPasswordRequestException
+	 */
 	public String getEncryptedPassword(BseUser bseUser) throws MFPasswordRequestException {
 		String getPasswordResponse = mfOrderEntryClient.getPassword(bseUser.getBseUserId(),
 				bseUser.getBseUserPassword(), BseStarMFConstants.BSE_PASS_KEY);
@@ -43,6 +55,19 @@ public class BseStarMFOrderService {
 		return getPassword.getEncryptedPassword();
 	}
 
+	/**
+	 * @param bseUser the BseUser object that encapsulates the member code, user ID and user password
+	 * @param euin The EUIN of the Distributor
+	 * @param internalRefNo An Internal Reference Number
+	 * @param clientCode The client code
+	 * @param schemeCode The MF Scheme Code
+	 * @param amount Order Amount
+	 * @param buySellType The type of Buy/Sell order - FRESH if no folio is provide or ADDITIONAL if folio is provided
+	 * @param folioNo - The Folio No
+	 * @param encryptedPassword Encrypted password generated from {@link #getEncryptedPassword}
+	 * @return The response provided by the platform on execution of the new purchase Order
+	 * @throws MFOrderServiceException
+	 */
 	public MFOrderEntryResponse newPurchaseOrder(BseUser bseUser, String euin, String internalRefNo, String clientCode,
 												 String schemeCode, BigDecimal amount, BuySellType buySellType, String folioNo, String encryptedPassword)
 			throws MFOrderServiceException {
@@ -60,6 +85,17 @@ public class BseStarMFOrderService {
 		return response;
 	}
 
+	/**
+	 *
+	 * @param bseUser the BseUser object that encapsulates the member code, user ID and user password
+	 * @param euin The EUIN of the Distributor
+	 * @param bseOrderId The BSE StarMF Order ID to cancel
+	 * @param clientCode The client code
+	 * @param buySellType The type of Buy/Sell order - FRESH if no folio is provided or ADDITIONAL if folio is provided
+	 * @param encryptedPassword Encrypted password generated from {@link #getEncryptedPassword}
+	 * @return The response provided by the platform on execution of the new cancellation Order
+	 * @throws MFOrderServiceException
+	 */
 	public CancelOrderResponse cancelPurchaseOrder(BseUser bseUser, String euin, String bseOrderId, String clientCode,
 			BuySellType buySellType, String encryptedPassword) throws MFOrderServiceException {
 		String transCode = MFOrderTransactionCode.CANCEL.getValue();
@@ -97,9 +133,23 @@ public class BseStarMFOrderService {
 		return response;
 	}
 
+	/**
+	 *
+	 * @param bseUser the BseUser object that encapsulates the member code, user ID and user password
+	 * @param euin The EUIN of the Distributor
+	 * @param clientCode The client code
+	 * @param internalRefNo An Internal Reference Number
+	 * @param schemeCode The MF Scheme Code
+	 * @param startDate The start date of the SIP
+	 * @param frequency The frequency of the SIP - MONTHLY/QUARTERLY/WEEKLY
+	 * @param instalmentAmount The SIP instalment Amount
+	 * @param noOfInstalments The number of instalments in this SIP
+	 * @param encryptedPassword Encrypted password generated from {@link #getEncryptedPassword}
+	 * @return The response provided by the platform on execution of the new SIP Order
+	 */
 	public SipOrderEntryResponse newSip(BseUser bseUser, String euin, String clientCode, String internalRefNo,
-			String schemeCode, LocalDate startDate, FrequencyType frequency, BigDecimal installmentAmount,
-			Integer noOfInstallments, String encryptedPassword) {
+			String schemeCode, LocalDate startDate, FrequencyType frequency, BigDecimal instalmentAmount,
+			Integer noOfInstalments, String encryptedPassword) {
 		String transactionCode = SipTransactionCode.NEW.getValue();
 		String uniqueRefNo = BseUtils.getUniqueRefNo();
 		String memberCode = bseUser.getBseMemberCode();
@@ -109,8 +159,8 @@ public class BseStarMFOrderService {
 		String startDateString = startDate.format(BseStarMFConstants.BSE_DATETIME_FORMATTER);
 		String frequencyType = frequency.getValue();
 		String frequencyAllowed = Integer.toString(1);
-		String installmentAmountString = installmentAmount.toPlainString();
-		String noOfInstallmentsString = noOfInstallments.toString();
+		String instalmentAmountString = instalmentAmount.toPlainString();
+		String noOfInstalmentsString = noOfInstalments.toString();
 		String remarks = null;
 		String folioNo = null;
 		String firstOrderFlag = BseStarMFConstants.N;
@@ -127,7 +177,7 @@ public class BseStarMFOrderService {
 
 		String sipOrderEntryResponseString = mfOrderEntryClient.sipOrderEntryParam(transactionCode, uniqueRefNo,
 				schemeCode, memberCode, clientCode, userID, internalRefNo, transMode, dpTxnMode, startDateString,
-				frequencyType, frequencyAllowed, installmentAmountString, noOfInstallmentsString, remarks, folioNo,
+				frequencyType, frequencyAllowed, instalmentAmountString, noOfInstalmentsString, remarks, folioNo,
 				firstOrderFlag, subberCode, euin, euinVal, dpc, regId, ipAdd, password, passKey, param1, param2,
 				param3);
 
@@ -135,30 +185,60 @@ public class BseStarMFOrderService {
 		return sipOrderEntryResponse;
 	}
 
+	/**
+	 *
+	 * @param bseUser the BseUser object that encapsulates the member code, user ID and user password
+	 * @param euin The EUIN of the Distributor
+	 * @param clientCode The client code
+	 * @param internalRefNo An Internal Reference Number
+	 * @param schemeCode The MF Scheme Code
+	 * @param startDate The start date of the ISIP
+	 * @param frequency The frequency of the ISIP - MONTHLY/QUARTERLY/WEEKLY
+	 * @param instalmentAmount The ISIP instalment Amount
+	 * @param noOfInstalments The number of instalments in this ISIP
+	 * @param iSipMandateID The ISIP Mandate ID to be used for this ISIP
+	 * @param encryptedPassword Encrypted password generated from {@link #getEncryptedPassword}
+	 * @return The response provided by the platform on execution of the new ISIP Order
+	 */
 	public IsipOrderEntryResponse newISip(BseUser bseUser, String euin, String clientCode, String internalRefNo,
-			String schemeCode, LocalDate startDate, FrequencyType frequency, BigDecimal installmentAmount,
-			Integer noOfInstallments, String iSipMandateID, String encryptedPassword) {
+			String schemeCode, LocalDate startDate, FrequencyType frequency, BigDecimal instalmentAmount,
+			Integer noOfInstalments, String iSipMandateID, String encryptedPassword) {
 
 		String responseString = mfOrderEntryClient.xsipOrderEntryParam(SipTransactionCode.NEW.getValue(),
 				BseUtils.getUniqueRefNo(), schemeCode, bseUser.getBseMemberCode(), clientCode, bseUser.getBseUserId(),
 				internalRefNo, TransMode.PHYSICAL.getValue(), DPTxn.PHYSICAL.getValue(),
 				startDate.format(BseStarMFConstants.BSE_DATETIME_FORMATTER), frequency.getValue(), Integer.toString(1),
-				installmentAmount.toPlainString(), noOfInstallments.toString(), null, null, BseStarMFConstants.N, null, null,
+				instalmentAmount.toPlainString(), noOfInstalments.toString(), null, null, BseStarMFConstants.N, null, null,
 				null, euin, BseStarMFConstants.Y, BseStarMFConstants.Y, null, null, encryptedPassword,
 				BseStarMFConstants.BSE_PASS_KEY, null, iSipMandateID, null);
 		IsipOrderEntryResponse xsipOrderEntryResponse = new IsipOrderEntryResponse(responseString);
 		return xsipOrderEntryResponse;
 	}
 
+	/**
+	 *
+	 * @param bseUser the BseUser object that encapsulates the member code, user ID and user password
+	 * @param euin The EUIN of the Distributor
+	 * @param clientCode The client code
+	 * @param internalRefNo An Internal Reference Number
+	 * @param schemeCode The MF Scheme Code
+	 * @param startDate The start date of the XSIP
+	 * @param frequency The frequency of the XSIP - MONTHLY/QUARTERLY/WEEKLY
+	 * @param instalmentAmount The XSIP instalment Amount
+	 * @param noOfInstalments The number of instalments in this XSIP
+	 * @param xSipMandateID The XSIP Mandate ID to be used for this XSIP
+	 * @param encryptedPassword Encrypted password generated from {@link #getEncryptedPassword}
+	 * @return The response provided by the platform on execution of the new XSIP Order
+	 */
 	public XsipOrderEntryResponse newXSip(BseUser bseUser, String euin, String clientCode, String internalRefNo,
-			String schemeCode, LocalDate startDate, FrequencyType frequency, BigDecimal installmentAmount,
-			Integer noOfInstallments, String xSipMandateID, String encryptedPassword) {
+			String schemeCode, LocalDate startDate, FrequencyType frequency, BigDecimal instalmentAmount,
+			Integer noOfInstalments, String xSipMandateID, String encryptedPassword) {
 
 		String responseString = mfOrderEntryClient.xsipOrderEntryParam(SipTransactionCode.NEW.getValue(),
 				BseUtils.getUniqueRefNo(), schemeCode, bseUser.getBseMemberCode(), clientCode, bseUser.getBseUserId(),
 				internalRefNo, TransMode.PHYSICAL.getValue(), DPTxn.PHYSICAL.getValue(),
 				startDate.format(BseStarMFConstants.BSE_DATETIME_FORMATTER), frequency.getValue(), Integer.toString(1),
-				installmentAmount.toPlainString(), noOfInstallments.toString(), null, null, BseStarMFConstants.N, null,
+				instalmentAmount.toPlainString(), noOfInstalments.toString(), null, null, BseStarMFConstants.N, null,
 				xSipMandateID, null, euin, BseStarMFConstants.Y, BseStarMFConstants.Y, null, null, encryptedPassword,
 				BseStarMFConstants.BSE_PASS_KEY, null, null, null);
 
@@ -167,6 +247,15 @@ public class BseStarMFOrderService {
 		return xsipOrderEntryResponse;
 	}
 
+	/**
+	 *
+	 * @param bseUser the BseUser object that encapsulates the member code, user ID and user password
+	 * @param euin The EUIN of the Distributor
+	 * @param clientCode The client code
+	 * @param sipRegId The SIP registration number to cancel
+	 * @param encryptedPassword Encrypted password generated from {@link #getEncryptedPassword}
+	 * @return The response provided by the platform on execution of the cancel SIP Order
+	 */
 	public SipOrderEntryResponse cancelSip(BseUser bseUser, String euin, String clientCode, String sipRegId,
 			String encryptedPassword) {
 		String transactionCode = SipTransactionCode.CANCEL.getValue();
@@ -178,6 +267,16 @@ public class BseStarMFOrderService {
 		return sipOrderEntryResponse;
 	}
 
+	/**
+	 *
+	 * @param bseUser the BseUser object that encapsulates the member code, user ID and user password
+	 * @param euin The EUIN of the Distributor
+	 * @param clientCode The client code
+	 * @param isipRegId The ISIP registration number to cancel
+	 * @param encryptedPassword Encrypted password generated from {@link #getEncryptedPassword}
+	 * @return The response provided by the platform on execution of the cancel ISIP Order
+	 * @return
+	 */
 	public IsipOrderEntryResponse cancelISip(BseUser bseUser, String euin, String clientCode, String isipRegId,
 			String encryptedPassword) {
 		String transactionCode = SipTransactionCode.CANCEL.getValue();
@@ -189,6 +288,15 @@ public class BseStarMFOrderService {
 		return isipOrderEntryResponse;
 	}
 
+	/**
+	 *
+	 * @param bseUser the BseUser object that encapsulates the member code, user ID and user password
+	 * @param euin The EUIN of the Distributor
+	 * @param clientCode The client code
+	 * @param xsipRegId The XSIP registration number to cancel
+	 * @param encryptedPassword Encrypted password generated from {@link #getEncryptedPassword}
+	 * @return The response provided by the platform on execution of the cancel XSIP Order
+	 */
 	public XsipOrderEntryResponse cancelXSip(BseUser bseUser, String euin, String clientCode, String xsipRegId,
 			String encryptedPassword) {
 		String transactionCode = SipTransactionCode.CANCEL.getValue();
@@ -200,6 +308,16 @@ public class BseStarMFOrderService {
 		return xsipOrderEntryResponse;
 	}
 
+	/**
+	 *
+	 * @param bseUser the BseUser object that encapsulates the member code, user ID and user password
+	 * @param euin The EUIN of the Distributor
+	 * @param clientCode The client code
+	 * @param schemeCode The MF Scheme Code
+	 * @param folioNo The Folio number on which the redemption order is to be executed
+	 * @param encryptedPassword Encrypted password generated from {@link #getEncryptedPassword}
+	 * @return
+	 */
 	public MFOrderEntryResponse newFullRedemptionOrder(BseUser bseUser, String euin, String clientCode,
 			String schemeCode, String folioNo, String encryptedPassword) {
 		String responseString = mfOrderEntryClient.orderEntryParam(MFOrderTransactionCode.NEW.getValue(),
@@ -212,6 +330,17 @@ public class BseStarMFOrderService {
 		return response;
 	}
 
+	/**
+	 * 
+	 * @param bseUser the BseUser object that encapsulates the member code, user ID and user password
+	 * @param euin The EUIN of the Distributor
+	 * @param clientCode The client code
+	 * @param schemeCode The MF Scheme Code
+	 * @param folioNo The Folio number on which the order is to be executed
+	 * @param folioNo The Order amount 
+	 * @param encryptedPassword Encrypted password generated from {@link #getEncryptedPassword}
+	 * @return
+	 */
 	public MFOrderEntryResponse newPartialRedemptionByAmountOrder(BseUser bseUser, String euin, String clientCode,
 			String schemeCode, String folioNo, BigDecimal amount, String encryptedPassword) {
 		String responseString = mfOrderEntryClient.orderEntryParam(MFOrderTransactionCode.NEW.getValue(),
@@ -224,6 +353,17 @@ public class BseStarMFOrderService {
 		return response;
 	}
 
+	/**
+	 * 
+	 * @param bseUser the BseUser object that encapsulates the member code, user ID and user password
+	 * @param euin The EUIN of the Distributor
+	 * @param clientCode The client code
+	 * @param schemeCode The MF Scheme Code
+	 * @param folioNo The Folio number on which the order is to be executed
+	 * @param qtyOfUnits The quantity of Units for the partial redemption order
+	 * @param encryptedPassword Encrypted password generated from {@link #getEncryptedPassword}
+	 * @return
+	 */
 	public MFOrderEntryResponse newPartialRedemptionByUnitsOrder(BseUser bseUser, String euin, String clientCode,
 			String schemeCode, String folioNo, BigDecimal qtyOfUnits, String encryptedPassword) {
 		String responseString = mfOrderEntryClient.orderEntryParam(MFOrderTransactionCode.NEW.getValue(),
@@ -236,6 +376,19 @@ public class BseStarMFOrderService {
 		return response;
 	}
 
+	/**
+	 * 
+	 * @param bseUser the BseUser object that encapsulates the member code, user ID and user password
+	 * @param clientCode The client code
+	 * @param euin The EUIN of the Distributor
+	 * @param fromSchemeCode The Scheme code from which the Switch out has to be executed
+	 * @param toSchemeCode The Scheme code to which the Switch in has to be executed
+	 * @param buySellType The Buy/Sell type - FRESH if folio no is provided or ADDITIONAL if folio no is not provided
+	 * @param folioNo The Folio number on which the order is to be executed
+	 * @param remarks Any remarks (optional)
+	 * @param encryptedPassword Encrypted password generated from {@link #getEncryptedPassword}
+	 * @return
+	 */
 	public MFOrderEntryResponse newFullSwitchOutOrder(BseUser bseUser, String clientCode, String euin,
 			String fromSchemeCode, String toSchemeCode, BuySellType buySellType, String folioNo, String remarks,
 			String encryptedPassword) {
@@ -249,6 +402,21 @@ public class BseStarMFOrderService {
 		return new MFOrderEntryResponse(responseString);
 	}
 
+	/**
+	 * 
+	 * @param bseUser the BseUser object that encapsulates the member code, user ID and user password
+	 * @param euin The EUIN of the Distributor
+	 * @param clientCode The client code
+	 * @param fromSchemeCode The Scheme code from which the Switch out has to be executed
+	 * @param toSchemeCode The Scheme code to which the Switch in has to be executed
+	 * @param buySellType The Buy/Sell type - FRESH if folio no is provided or ADDITIONAL if folio no is not provided
+	 * @param switchAmount The switch Amount
+	 * @param switchUnits The switch Units
+	 * @param folioNo The Folio number on which the order is to be executed
+	 * @param remarks Any remarks (optional)
+	 * @param encryptedPassword Encrypted password generated from {@link #getEncryptedPassword}
+	 * @return
+	 */
 	public MFOrderEntryResponse newPartialSwitchOutOrder(BseUser bseUser, String euin, String clientCode,
 			String fromSchemeCode, String toSchemeCode, BuySellType buySellType,String switchAmount, String switchUnits, 
 			String folioNo, String remarks, String encryptedPassword) {
@@ -262,6 +430,18 @@ public class BseStarMFOrderService {
 		return new MFOrderEntryResponse(responseString);
 	}
 
+	/**
+	 * 
+	 * @param bseUser the BseUser object that encapsulates the member code, user ID and user password
+	 * @param euin The EUIN of the Distributor
+	 * @param clientCode The client code
+	 * @param fromSchemeCode The Scheme code from which the Switch out has to be executed
+	 * @param toSchemeCode The Scheme code to which the Switch in has to be executed
+	 * @param buySellType The Buy/Sell type - FRESH if folio no is provided or ADDITIONAL if folio no is not provided
+	 * @param folioNo The Folio number on which the order is to be executed
+	 * @param encryptedPassword Encrypted password generated from {@link #getEncryptedPassword}
+	 * @return
+	 */
 	public MFOrderEntryResponse cancelFullSwitchOrder(BseUser bseUser, String euin, String clientCode,
 			String fromSchemeCode, String toSchemeCode, BuySellType buySellType, String folioNo,
 			String encryptedPassword) {
@@ -274,6 +454,20 @@ public class BseStarMFOrderService {
 		return new MFOrderEntryResponse(responseString);
 	}
 
+	/**
+	 * 
+	 * @param bseUser the BseUser object that encapsulates the member code, user ID and user password
+	 * @param euin The EUIN of the Distributor
+	 * @param clientCode The client code
+	 * @param fromSchemeCode The Scheme code from which the Switch out has to be executed
+	 * @param toSchemeCode The Scheme code to which the Switch in has to be executed
+	 * @param buySellType The Buy/Sell type - FRESH if folio no is provided or ADDITIONAL if folio no is not provided
+	 * @param folioNo The Folio number on which the order is to be executed
+	 * @param switchAmount The switch Amount
+	 * @param switchUnits The switch units
+	 * @param encryptedPassword Encrypted password generated from {@link #getEncryptedPassword}
+	 * @return
+	 */
 	public MFOrderEntryResponse cancelPartialSwitchOrder(BseUser bseUser, String euin, String clientCode,
 			String fromSchemeCode, String toSchemeCode, BuySellType buySellType, String folioNo, String switchAmount,
 			String switchUnits, String encryptedPassword) {

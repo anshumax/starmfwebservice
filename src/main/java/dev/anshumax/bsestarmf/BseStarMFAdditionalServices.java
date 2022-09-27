@@ -55,13 +55,23 @@ public class BseStarMFAdditionalServices {
 	private IStarMFWebService starMFWebServiceClient;
 	
 	private DateTimeFormatter starMfDateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-	
+
+	/**
+	 *
+	 * @param url
+	 * @throws MalformedURLException
+	 */
 	public BseStarMFAdditionalServices(String url) throws MalformedURLException {
 		StarMFWebService starMFWebService = new StarMFWebService(url);
 		AddressingFeature addressingFeature = new AddressingFeature(true,true);
 		starMFWebServiceClient = starMFWebService.getWSHttpBindingIStarMFWebService1(addressingFeature);
 	}
-	
+
+	/**
+	 *
+	 * @param bseUser
+	 * @return
+	 */
 	public boolean isBseUserValid(BseUser bseUser) {
 		try {
 			String getPasswordResponse = starMFWebServiceClient.getPassword(bseUser.getBseUserId(), bseUser.getBseMemberCode(), bseUser.getBseUserPassword(), BseStarMFConstants.BSE_PASS_KEY);
@@ -71,7 +81,13 @@ public class BseStarMFAdditionalServices {
 			return false;
 		}
 	}
-	
+
+	/**
+	 *
+	 * @param bseUser
+	 * @return
+	 * @throws MFPasswordRequestException
+	 */
 	public String getEncryptedPassword(BseUser bseUser) throws MFPasswordRequestException{
 		String getPasswordResponse = starMFWebServiceClient.getPassword(bseUser.getBseUserId(), bseUser.getBseMemberCode(), bseUser.getBseUserPassword(), BseStarMFConstants.BSE_PASS_KEY);
 		Password password = new Password(getPasswordResponse);
@@ -80,8 +96,14 @@ public class BseStarMFAdditionalServices {
 		}
 		return password.getEncryptedPassword();
 	}
-	
-	
+
+	/**
+	 *
+	 * @param bseUser
+	 * @param accessTokenRequestType
+	 * @return
+	 * @throws MFPasswordRequestException
+	 */
 	public String getAccessToken(BseUser bseUser, AccessTokenRequestType accessTokenRequestType) throws MFPasswordRequestException {
 		PasswordRequest passwordRequest = new PasswordRequest();
 		passwordRequest.setMemberId(bseUser.getBseMemberCode());
@@ -96,6 +118,19 @@ public class BseStarMFAdditionalServices {
 		return response.getResponseString();
 	}
 
+	/**
+	 *
+	 * @param bseUser
+	 * @param clientCode
+	 * @param fromDate
+	 * @param orderStatus
+	 * @param orderType
+	 * @param settType
+	 * @param subOrderType
+	 * @param toDate
+	 * @param transactionType
+	 * @return
+	 */
 	public OrderResponse getOrderDetails(BseUser bseUser, String clientCode, String fromDate, OrderStatus orderStatus, OrderType orderType, SettlementType settType, SubOrderType subOrderType, String toDate, TransactionType transactionType) {
 		OrderRequest orderRequest = new OrderRequest();
 		orderRequest.setClientCode(clientCode);
@@ -114,7 +149,16 @@ public class BseStarMFAdditionalServices {
 		return orderResponse;
 		
 	}
-	
+
+	/**
+	 *
+	 * @param bseUser
+	 * @param clientCode
+	 * @param orderNo
+	 * @param encryptedPassword
+	 * @return
+	 * @throws MFAdditionalServicesException
+	 */
 	public String getPaymentStatus(BseUser bseUser, String clientCode, String orderNo, String encryptedPassword) throws MFAdditionalServicesException {
 		
 		String param = new StringBuilder()
@@ -131,7 +175,19 @@ public class BseStarMFAdditionalServices {
 		}
 		return paymentStatusResponse.getRemarks();
 	}
-	
+
+	/**
+	 *
+	 * @param bseUser
+	 * @param clientCode
+	 * @param fromDate
+	 * @param orderStatus
+	 * @param orderType
+	 * @param settType
+	 * @param subOrderType
+	 * @param toDate
+	 * @return
+	 */
 	public AllotmentStatementResponse getAllotmentDetailsByDates(BseUser bseUser, String clientCode, String fromDate, OrderStatus orderStatus, OrderType orderType, SettlementType settType, SubOrderType subOrderType, String toDate) {
 		AllotmentStatementRequest allotmentStatementRequest = new AllotmentStatementRequest();
 		allotmentStatementRequest.setClientCode(clientCode);
@@ -146,7 +202,14 @@ public class BseStarMFAdditionalServices {
 		allotmentStatementRequest.setUserId(bseUser.getBseUserId());
 		return starMFWebServiceClient.allotmentStatement(allotmentStatementRequest);
 	}
-	
+
+	/**
+	 *
+	 * @param bseUser
+	 * @param fromDate
+	 * @param toDate
+	 * @return
+	 */
 	public AllotmentStatementResponse getAllotmentDetails(BseUser bseUser, LocalDate fromDate, LocalDate toDate) {
 		OrderStatus orderStatus = OrderStatus.ALL;
 		OrderType orderType = OrderType.ALL;
@@ -165,6 +228,18 @@ public class BseStarMFAdditionalServices {
 		allotmentStatementRequest.setUserId(bseUser.getBseUserId());
 		return starMFWebServiceClient.allotmentStatement(allotmentStatementRequest);
 	}
+
+	/**
+	 *
+	 * @param bseUser
+	 * @param clientCode
+	 * @param orderStatus
+	 * @param orderType
+	 * @param settType
+	 * @param subOrderType
+	 * @param orderNo
+	 * @return
+	 */
 	public AllotmentStatementResponse getAllotmentDetailsByOrderNo(BseUser bseUser, String clientCode, OrderStatus orderStatus, OrderType orderType, SettlementType settType, SubOrderType subOrderType, String orderNo) {
 		AllotmentStatementRequest allotmentStatementRequest = new AllotmentStatementRequest();
 		allotmentStatementRequest.setClientCode(clientCode);
@@ -178,7 +253,13 @@ public class BseStarMFAdditionalServices {
 		allotmentStatementRequest.setSubOrderType(subOrderType.getValue());
 		return starMFWebServiceClient.allotmentStatement(allotmentStatementRequest);
 	}
-	
+
+	/**
+	 *
+	 * @param bseUser
+	 * @param pan
+	 * @return
+	 */
 	public AOFPanSearchResponse aofPanSearch(BseUser bseUser, String pan) {
 		AOFPanSearchRequest aofPanSearchRequest = new AOFPanSearchRequest();
 		aofPanSearchRequest.setPAN(pan);
@@ -187,7 +268,17 @@ public class BseStarMFAdditionalServices {
 		aofPanSearchRequest.setUserId(bseUser.getBseUserId());
 		return starMFWebServiceClient.aofPanSearch(aofPanSearchRequest);
 	}
-	
+
+	/**
+	 *
+	 * @param bseUser
+	 * @param clientCode
+	 * @param systematicPlanType
+	 * @param sipRegNo
+	 * @param childOrderDate
+	 * @param encryptedPassword
+	 * @return
+	 */
 	public ChildOrderResponse getChildOrderDetails(BseUser bseUser, String clientCode, SystematicPlanType systematicPlanType, String sipRegNo, LocalDate childOrderDate, String encryptedPassword) {
 		System.out.println(childOrderDate.format(BseStarMFConstants.BSE_DATETIME_FORMATTER));
 		ChildOrderRequest childOrderRequest = new ChildOrderRequest();
@@ -199,14 +290,26 @@ public class BseStarMFAdditionalServices {
 		childOrderRequest.setSystematicPlanType(systematicPlanType.getValue());
 		return starMFWebServiceClient.childOrderDetails(childOrderRequest);
 	}
-	
+
+	/**
+	 *
+	 * @param bseUser
+	 * @param clientCode
+	 * @param encryptedPassword
+	 */
 	public void redemptionAuthentication(BseUser bseUser, String clientCode, String encryptedPassword) {
 		String param =  bseUser.getBseMemberCode() + "|" + clientCode;
 		System.out.println(param);
 		String responseString = starMFWebServiceClient.mfapi(AdditionServicesFlag.CLIENT_REDEMPTION_SMS_AUTHENTICATION.getValue(), bseUser.getBseUserId(), encryptedPassword, param);
 		System.out.println(responseString);
 	}
-	
+
+	/**
+	 * @param bseUser
+	 * @param ucc
+	 * @param encryptedPassword
+	 * @return
+	 */
 	public UccResponse uploadUcc(BseUser bseUser, Ucc ucc, String encryptedPassword){
 
 		String uccMfdParam = ucc.getUccString();
@@ -216,7 +319,14 @@ public class BseStarMFAdditionalServices {
 		
 		return uccResponse;
 	}
-	
+
+	/**
+	 *
+	 * @param bseUser
+	 * @param fatca
+	 * @param encryptedPassword
+	 * @return
+	 */
 	public FatcaResponse uploadFacta(BseUser bseUser, Fatca fatca, String encryptedPassword) {
 		String fatcaUploadParam = fatca.getFatcaString();
 		String fatcaResponseString = starMFWebServiceClient.mfapi(AdditionServicesFlag.FATCA_UPLOAD.getValue(), bseUser.getBseUserId(), encryptedPassword, fatcaUploadParam);
@@ -224,7 +334,14 @@ public class BseStarMFAdditionalServices {
 		return fatcaResponse;
 		
 	}
-	
+
+	/**
+	 *
+	 * @param bseUser
+	 * @param fromDate
+	 * @param toDate
+	 * @return
+	 */
 	public OrderResponse getAllPurchaseOrderStatusDetails(BseUser bseUser, LocalDate fromDate, LocalDate toDate) {
 		
 		OrderRequest orderRequest = new OrderRequest();
@@ -240,7 +357,14 @@ public class BseStarMFAdditionalServices {
 		orderRequest.setUserId(bseUser.getBseUserId());
 		return starMFWebServiceClient.orderStatus(orderRequest);
 	}
-	
+
+	/**
+	 *
+	 * @param bseUser
+	 * @param fromDate
+	 * @param toDate
+	 * @return
+	 */
 	public OrderResponse getAllRedemptionOrderStatusDetails(BseUser bseUser, LocalDate fromDate, LocalDate toDate) {
 		
 		OrderRequest orderRequest = new OrderRequest();
@@ -355,7 +479,16 @@ public class BseStarMFAdditionalServices {
 		
 		return response.getMandateDetails().getMandateDetails();
 	}
-	
+
+	/**
+	 *
+	 * @param bseUser
+	 * @param clientCode
+	 * @param logoutUrl
+	 * @param encryptedPassword
+	 * @return
+	 * @throws MFAdditionalServicesException
+	 */
 	public String getPaymentLink(BseUser bseUser, String clientCode, String logoutUrl, String encryptedPassword) throws MFAdditionalServicesException {
 		String param = bseUser.getBseMemberCode() + "|" + clientCode + "|" + logoutUrl;
 		String responseString = starMFWebServiceClient.mfapi(AdditionServicesFlag.PAYMENT_GATEWAY.getValue(), bseUser.getBseUserId(), encryptedPassword, param);
@@ -365,7 +498,25 @@ public class BseStarMFAdditionalServices {
 		}
 		return mfapiResult.getResponse();
 	}
-	
+
+	/**
+	 *
+	 * @param bseUser
+	 * @param euin
+	 * @param clientCode
+	 * @param fromSchemeCode
+	 * @param toSchemeCode
+	 * @param buySellType
+	 * @param folioNo
+	 * @param internalReferenceNo
+	 * @param startDate
+	 * @param frequencyType
+	 * @param noOfTransfers
+	 * @param installmentAmount
+	 * @param remarks
+	 * @param encryptedPassword
+	 * @return
+	 */
 	public StpOrderEntryResponse newStp(BseUser bseUser, String euin, String clientCode, String fromSchemeCode, String toSchemeCode, 
 			BuySellType buySellType, String folioNo, String internalReferenceNo, LocalDate startDate, 
 			FrequencyType frequencyType, Integer noOfTransfers, String installmentAmount, String remarks, String encryptedPassword) {
@@ -393,7 +544,24 @@ public class BseStarMFAdditionalServices {
 		
 		return new StpOrderEntryResponse(responseString);
 	}
-	
+
+	/**
+	 *
+	 * @param bseUser
+	 * @param euin
+	 * @param clientCode
+	 * @param schemeCode
+	 * @param folioNo
+	 * @param internalReferenceNo
+	 * @param startDate
+	 * @param noOfWithdrawals
+	 * @param frequencyType
+	 * @param installmentAmount
+	 * @param installmentUnits
+	 * @param remarks
+	 * @param encryptedPassword
+	 * @return
+	 */
 	public SwpOrderEntryResponse newSwp(BseUser bseUser, String euin, String clientCode, String schemeCode, String folioNo, 
 			String internalReferenceNo,	LocalDate startDate, Integer noOfWithdrawals, FrequencyType frequencyType, 
 			String installmentAmount, String installmentUnits, String remarks, String encryptedPassword) {
@@ -419,7 +587,17 @@ public class BseStarMFAdditionalServices {
 		
 		return new SwpOrderEntryResponse(responseString);
 	}
-	
+
+	/**
+	 *
+	 * @param bseUser
+	 * @param euin
+	 * @param stpRegistrationNo
+	 * @param clientCode
+	 * @param remarks
+	 * @param encryptedPassword
+	 * @return
+	 */
 	public StpOrderEntryResponse cancelStp(BseUser bseUser, String euin, String stpRegistrationNo, String clientCode, 
 			String remarks, String encryptedPassword) {
 		String stpCancellationParamString = new StringBuilder()
@@ -432,7 +610,17 @@ public class BseStarMFAdditionalServices {
 		
 		return new StpOrderEntryResponse(responseString);
 	}
-	
+
+	/**
+	 *
+	 * @param bseUser
+	 * @param euin
+	 * @param swpRegistrationNo
+	 * @param clientCode
+	 * @param remarks
+	 * @param encryptedPassword
+	 * @return
+	 */
 	public SwpOrderEntryResponse cancelSwp(BseUser bseUser, String euin, String swpRegistrationNo, String clientCode, 
 			String remarks, String encryptedPassword) {
 		String swpCancellationParamString = new StringBuilder()
