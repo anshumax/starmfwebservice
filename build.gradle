@@ -1,14 +1,31 @@
 plugins {
     id 'java-library'
+    id 'maven-publish'
 }
 
-group = "anshumax.dev"
-version = "1.0"
+group = 'anshumax.dev'
+version = '1.0'
 sourceCompatibility = 11
 targetCompatibility = 11
 
+
 repositories {
     mavenCentral()
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from components.java
+            groupId group
+            artifactId rootProject.name
+            version version
+            pom {
+                name = 'BSE StarMF Java Library'
+                description = 'An implementation of the BSE StarMF SOAP Web Service in Java.'
+            }
+        }
+    }
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {
