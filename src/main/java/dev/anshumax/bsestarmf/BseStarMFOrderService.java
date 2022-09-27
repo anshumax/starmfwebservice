@@ -1,5 +1,6 @@
 package dev.anshumax.bsestarmf;
 
+import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.time.LocalDate;
 
@@ -43,13 +44,13 @@ public class BseStarMFOrderService {
 	}
 
 	public MFOrderEntryResponse newPurchaseOrder(BseUser bseUser, String euin, String internalRefNo, String clientCode,
-			String schemeCode, Double amount, BuySellType buySellType, String folioNo, String encryptedPassword)
+												 String schemeCode, BigDecimal amount, BuySellType buySellType, String folioNo, String encryptedPassword)
 			throws MFOrderServiceException {
 
 		String responseString = mfOrderEntryClient.orderEntryParam(MFOrderTransactionCode.NEW.getValue(),
 				BseUtils.getUniqueRefNo(), null, bseUser.getBseUserId(), bseUser.getBseMemberCode(), clientCode,
 				schemeCode, TransactionType.PURCHASE.getValue(), buySellType.getValue(), DPTxn.PHYSICAL.getValue(),
-				amount.toString(), null, BseStarMFConstants.Y, folioNo, null, BseStarMFConstants.Y, internalRefNo, null,
+				amount.toPlainString(), null, BseStarMFConstants.Y, folioNo, null, BseStarMFConstants.Y, internalRefNo, null,
 				euin, BseStarMFConstants.Y, BseStarMFConstants.Y, BseStarMFConstants.Y, null, encryptedPassword,
 				BseStarMFConstants.BSE_PASS_KEY, null, null, null);
 		MFOrderEntryResponse response = new MFOrderEntryResponse(responseString);
@@ -97,7 +98,7 @@ public class BseStarMFOrderService {
 	}
 
 	public SipOrderEntryResponse newSip(BseUser bseUser, String euin, String clientCode, String internalRefNo,
-			String schemeCode, LocalDate startDate, FrequencyType frequency, Double installmentAmount,
+			String schemeCode, LocalDate startDate, FrequencyType frequency, BigDecimal installmentAmount,
 			Integer noOfInstallments, String encryptedPassword) {
 		String transactionCode = SipTransactionCode.NEW.getValue();
 		String uniqueRefNo = BseUtils.getUniqueRefNo();
@@ -108,7 +109,7 @@ public class BseStarMFOrderService {
 		String startDateString = startDate.format(BseStarMFConstants.BSE_DATETIME_FORMATTER);
 		String frequencyType = frequency.getValue();
 		String frequencyAllowed = Integer.toString(1);
-		String installmentAmountString = installmentAmount.toString();
+		String installmentAmountString = installmentAmount.toPlainString();
 		String noOfInstallmentsString = noOfInstallments.toString();
 		String remarks = null;
 		String folioNo = null;
@@ -135,14 +136,14 @@ public class BseStarMFOrderService {
 	}
 
 	public IsipOrderEntryResponse newISip(BseUser bseUser, String euin, String clientCode, String internalRefNo,
-			String schemeCode, LocalDate startDate, FrequencyType frequency, Double installmentAmount,
+			String schemeCode, LocalDate startDate, FrequencyType frequency, BigDecimal installmentAmount,
 			Integer noOfInstallments, String iSipMandateID, String encryptedPassword) {
 
 		String responseString = mfOrderEntryClient.xsipOrderEntryParam(SipTransactionCode.NEW.getValue(),
 				BseUtils.getUniqueRefNo(), schemeCode, bseUser.getBseMemberCode(), clientCode, bseUser.getBseUserId(),
 				internalRefNo, TransMode.PHYSICAL.getValue(), DPTxn.PHYSICAL.getValue(),
 				startDate.format(BseStarMFConstants.BSE_DATETIME_FORMATTER), frequency.getValue(), Integer.toString(1),
-				installmentAmount.toString(), noOfInstallments.toString(), null, null, BseStarMFConstants.N, null, null,
+				installmentAmount.toPlainString(), noOfInstallments.toString(), null, null, BseStarMFConstants.N, null, null,
 				null, euin, BseStarMFConstants.Y, BseStarMFConstants.Y, null, null, encryptedPassword,
 				BseStarMFConstants.BSE_PASS_KEY, null, iSipMandateID, null);
 		IsipOrderEntryResponse xsipOrderEntryResponse = new IsipOrderEntryResponse(responseString);
@@ -150,14 +151,14 @@ public class BseStarMFOrderService {
 	}
 
 	public XsipOrderEntryResponse newXSip(BseUser bseUser, String euin, String clientCode, String internalRefNo,
-			String schemeCode, LocalDate startDate, FrequencyType frequency, Double installmentAmount,
+			String schemeCode, LocalDate startDate, FrequencyType frequency, BigDecimal installmentAmount,
 			Integer noOfInstallments, String xSipMandateID, String encryptedPassword) {
 
 		String responseString = mfOrderEntryClient.xsipOrderEntryParam(SipTransactionCode.NEW.getValue(),
 				BseUtils.getUniqueRefNo(), schemeCode, bseUser.getBseMemberCode(), clientCode, bseUser.getBseUserId(),
 				internalRefNo, TransMode.PHYSICAL.getValue(), DPTxn.PHYSICAL.getValue(),
 				startDate.format(BseStarMFConstants.BSE_DATETIME_FORMATTER), frequency.getValue(), Integer.toString(1),
-				installmentAmount.toString(), noOfInstallments.toString(), null, null, BseStarMFConstants.N, null,
+				installmentAmount.toPlainString(), noOfInstallments.toString(), null, null, BseStarMFConstants.N, null,
 				xSipMandateID, null, euin, BseStarMFConstants.Y, BseStarMFConstants.Y, null, null, encryptedPassword,
 				BseStarMFConstants.BSE_PASS_KEY, null, null, null);
 
@@ -212,11 +213,11 @@ public class BseStarMFOrderService {
 	}
 
 	public MFOrderEntryResponse newPartialRedemptionByAmountOrder(BseUser bseUser, String euin, String clientCode,
-			String schemeCode, String folioNo, Double amount, String encryptedPassword) {
+			String schemeCode, String folioNo, BigDecimal amount, String encryptedPassword) {
 		String responseString = mfOrderEntryClient.orderEntryParam(MFOrderTransactionCode.NEW.getValue(),
 				BseUtils.getUniqueRefNo(), null, bseUser.getBseUserId(), bseUser.getBseMemberCode(), clientCode,
 				schemeCode, TransactionType.REDEMPTION.getValue(), BuySellType.FRESH.getValue(),
-				DPTxn.PHYSICAL.getValue(), amount.toString(), null, BseStarMFConstants.N, folioNo, null,
+				DPTxn.PHYSICAL.getValue(), amount.toPlainString(), null, BseStarMFConstants.N, folioNo, null,
 				BseStarMFConstants.Y, null, null, euin, BseStarMFConstants.Y, BseStarMFConstants.Y,
 				BseStarMFConstants.Y, null, encryptedPassword, BseStarMFConstants.BSE_PASS_KEY, null, null, null);
 		MFOrderEntryResponse response = new MFOrderEntryResponse(responseString);
@@ -224,11 +225,11 @@ public class BseStarMFOrderService {
 	}
 
 	public MFOrderEntryResponse newPartialRedemptionByUnitsOrder(BseUser bseUser, String euin, String clientCode,
-			String schemeCode, String folioNo, Double qtyOfUnits, String encryptedPassword) {
+			String schemeCode, String folioNo, BigDecimal qtyOfUnits, String encryptedPassword) {
 		String responseString = mfOrderEntryClient.orderEntryParam(MFOrderTransactionCode.NEW.getValue(),
 				BseUtils.getUniqueRefNo(), null, bseUser.getBseUserId(), bseUser.getBseMemberCode(), clientCode,
 				schemeCode, TransactionType.REDEMPTION.getValue(), BuySellType.FRESH.getValue(),
-				DPTxn.PHYSICAL.getValue(), null, qtyOfUnits.toString(), BseStarMFConstants.N, folioNo, null,
+				DPTxn.PHYSICAL.getValue(), null, qtyOfUnits.toPlainString(), BseStarMFConstants.N, folioNo, null,
 				BseStarMFConstants.Y, null, null, euin, BseStarMFConstants.Y, BseStarMFConstants.Y,
 				BseStarMFConstants.Y, null, encryptedPassword, BseStarMFConstants.BSE_PASS_KEY, null, null, null);
 		MFOrderEntryResponse response = new MFOrderEntryResponse(responseString);

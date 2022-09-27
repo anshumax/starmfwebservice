@@ -1,5 +1,6 @@
 package dev.anshumax.bsestarmf;
 
+import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.util.Arrays;
 
@@ -38,7 +39,7 @@ public class BseStarMFPaymentGatewayService {
 		return response.getResponseString();
 	}
 	
-	public String getDirectPaymentPage(BseUser bseUser, String[] orders, String totalAmount, String accountNo, String ifsc, String bankId, PaymentMode paymentMode, String logoutUrl, String clientCode, String encryptedPassword) throws MFPaymentServiceException {
+	public String getDirectPaymentPage(BseUser bseUser, String[] orders, BigDecimal totalAmount, String accountNo, String ifsc, String bankId, PaymentMode paymentMode, String logoutUrl, String clientCode, String encryptedPassword) throws MFPaymentServiceException {
 		ArrayOfstring ordersArray = new ArrayOfstring();
 		ordersArray.getString().addAll(Arrays.asList(orders));
 		
@@ -52,7 +53,7 @@ public class BseStarMFPaymentGatewayService {
 		param.setMemberCode(bseUser.getBseMemberCode());
 		param.setMode(paymentMode.getValue());
 		param.setOrders(ordersArray);
-		param.setTotalAmount(totalAmount.toString());
+		param.setTotalAmount(totalAmount.toPlainString());
 		
 		Response response = starMFPaymentGatewayServiceClient.paymentGatewayAPI(param);
 		if(BseStarMFConstants.STATUS_100.equals(response.getStatus())){
